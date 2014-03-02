@@ -4,10 +4,6 @@ var zerorpc = require("zerorpc");
 var client = new zerorpc.Client();
 client.connect("tcp://127.0.0.1:4242");
 
-client.invoke("hello", "World!", function(error, res, more) {
-	console.log(res);
-});
-
 var express = require("express");
 var app = express();
 
@@ -42,6 +38,10 @@ app.post("/analyze", function(req, res) {
 				console.log(err);
 			} else {
 				console.log("The file was saved!");
+
+				client.invoke("save", "/tmp/test.jpg", function(error, res, more) {
+					console.log(res);
+				});
 			}
 		}); 
 
