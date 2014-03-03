@@ -9,9 +9,8 @@ class NoteProcessorRPC(object):
 		raw = cv_wrap.imread_color(filename)
 		note = paper.deskew_and_crop(raw)
 
-		cv2.imwrite(filename, raw)
-		if note:
-			#cv2.imwrite(filename+".note", note)
+		if note != None:
+			cv2.imwrite(filename, note)
 			return True
 		else:
 			return False
