@@ -9,7 +9,7 @@
         "zerorpc": "latest"
     },
 	"scripts": {
-		"start": "node app.js && python python/cv_server.py"
+		"start": "node app.js & python python/cv_server.py"
 	},
     "author": "https://github.com/jmptable"
 }
