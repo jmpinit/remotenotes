@@ -4,15 +4,45 @@ html
 		title= "remote"
 
 		meta(name="viewport" content="width=device-width, initial-scale=1.0")
-		link(href="css/bootstrap.min.css" rel="stylesheet" media="screen")
+		link(href="/css/bootstrap.min.css" rel="stylesheet" media="screen")
 
-		script(src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
-		script(src='/socket.io/socket.io.js')
-	body
+	body(onload='start()')
 		div(class='container')
 			h1 Note Server
-			ul
+			ul#notelist
 				each val in notes
 					li
 						a(href='/note/' + val)
 							p=val
+	
+	script(type='text/javascript').
+		var socket;
+
+		function connect() {
+			socket = io.connect(null);
+
+			socket.on('notes', function(notes) {
+				console.log("notes received in notes");
+				console.log(notes);
+
+				if(notes.length() > 0) {
+					var noteList = $('#notelist')
+					$.each(notes, function(note) {
+						var li = $('<li/>').appendTo(noteList);
+						var link = $('<a/>').text(note).appendTo(li);
+					});
+				}
+			});
+
+			socket.on('disconnect', function(){ });
+			socket.on('reconnect', function(){ });
+		}
+
+	script(type='text/javascript').
+		function start() {
+			// socket.io
+			connect();
+		}
+
+	script(src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+	script(src='/socket.io/socket.io.js')

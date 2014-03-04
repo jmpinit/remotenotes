@@ -43,6 +43,7 @@ app.post("/analyze", function(req, res) {
 				console.log(err);
 			} else {
 				notes.push(id_pic);
+				io.sockets.emit('notes', { message: notes });
 
 				console.log(id_pic + " saved.");
 
@@ -78,13 +79,12 @@ app.get("/", function(req, res) {
 	});
 });
  
-/*
 io.sockets.on('connection', function (socket) {
-	socket.emit('message', { message: 'server: hello there' });
-
-	socket.on('send', function (data) {
-		io.sockets.emit('message', data);
-	});
+	socket.emit('notes', { message: notes });
 });
-*/
+
+io.sockets.on('reconnection', function (socket) {
+	socket.emit('notes', { message: notes });
+});
+
 console.log("Listening on port " + port);
