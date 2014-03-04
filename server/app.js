@@ -17,13 +17,12 @@ app.use(express.static(__dirname + '/data'));
 // socket.io setup
 var io = require('socket.io').listen(app.listen(port));
 
+var notes = [];
+
 // jade settings
 app.set('views', __dirname + '/templates');
 app.set('view engine', "jade");
 app.engine('jade', require('jade').__express);
-app.get("/", function(req, res){
-	res.render("index");
-});
 
 app.post("/analyze", function(req, res) {
 	var data = new Buffer('');
@@ -43,6 +42,8 @@ app.post("/analyze", function(req, res) {
 			if(err) {
 				console.log(err);
 			} else {
+				notes.push(id_pic);
+
 				console.log(id_pic + " saved.");
 
 				client.invoke("save", fn_pic, function(error, res, more) { });
@@ -68,7 +69,16 @@ app.get("/note/:basename", function(req, res) {
 	}); 
 });
 
+app.get("/", function(req, res) {
+	console.log("rendering index");
+	console.log(notes);
+
+	res.render('index', {
+		notes: notes
+	});
+});
  
+/*
 io.sockets.on('connection', function (socket) {
 	socket.emit('message', { message: 'server: hello there' });
 
@@ -76,5 +86,5 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.emit('message', data);
 	});
 });
- 
+*/
 console.log("Listening on port " + port);
