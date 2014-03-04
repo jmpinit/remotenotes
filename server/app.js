@@ -1,5 +1,6 @@
 var fs = require('fs');
 var zerorpc = require("zerorpc");
+var uuid = require('node-uuid');
 
 var client = new zerorpc.Client();
 client.connect("tcp://127.0.0.1:4242");
@@ -11,6 +12,7 @@ var port = 3700;
 
 // static server
 app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/data'));
 
 // socket.io setup
 var io = require('socket.io').listen(app.listen(port));
@@ -33,15 +35,17 @@ app.post("/analyze", function(req, res) {
 	req.on('end', function() {
 		req.rawBody = data;
 
-		fs.writeFile("/tmp/test.jpg", data, function(err) {
+		// generate a new id for this picture
+		var id_pic = uuid.v4();
+		var fn_pic = __dirname + "/data/image/" + id_pic + ".jpg";
+
+		fs.writeFile(fn_pic, data, function(err) {
 			if(err) {
 				console.log(err);
 			} else {
-				console.log("The file was saved!");
+				console.log(id_pic + " saved.");
 
-				client.invoke("save", "/tmp/test.jpg", function(error, res, more) {
-					console.log(res);
-				});
+				client.invoke("save", fn_pic, function(error, res, more) { });
 			}
 		}); 
 
@@ -50,6 +54,20 @@ app.post("/analyze", function(req, res) {
 		res.end();
 	});
 });
+
+app.get("/image/:basename", function(req, res) {
+	var basename_pic = req.params.basename;
+	var fn_pic = "/data/image/" + basename_pic;
+	var url_pic = "image/" + basename_pic;
+
+	console.log("request for image " + url_pic);
+
+	res.render('image', {
+		id_pic: basename_pic,
+		url_pic: url_pic
+	}); 
+});
+
  
 io.sockets.on('connection', function (socket) {
 	socket.emit('message', { message: 'server: hello there' });
