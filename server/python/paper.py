@@ -4,7 +4,7 @@ import math
 
 from cv_wrap import *
 
-paper_width, paper_height = (8.5*200, 11*200) # FIXME
+paper_width, paper_height = (8.5*50, 11*50) # FIXME
 
 def angle(pt1, pt2, pt0):
 	pt0 = Point(pt0)
