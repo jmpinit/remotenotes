@@ -6,17 +6,37 @@
     tools:context="com.example.remotenotes.OverviewActivity"
     tools:ignore="MergeRootFrame" >
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Take Picture"
-        android:id="@+id/btn_capture"
-        android:layout_gravity="center_horizontal|bottom"
-        android:onClick="onButtonClick" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
 
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/img_thumbnail"
-        android:layout_gravity="center" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/img_thumbnail"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/txt_address"
+            android:layout_gravity="bottom|left"
+            android:text="18.111.108.164" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Take Picture"
+            android:id="@+id/btn_capture"
+            android:layout_gravity="center_horizontal|bottom|right"
+            android:onClick="onButtonClick" />
+    </LinearLayout>
+
 </FrameLayout>

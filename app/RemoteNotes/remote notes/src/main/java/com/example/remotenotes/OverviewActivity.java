@@ -1,6 +1,7 @@
 package com.example.remotenotes;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,8 +20,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -40,6 +44,7 @@ public class OverviewActivity extends ActionBarActivity {
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
     ImageView mImageView;
+    EditText txtAddress;
 
     private Bitmap bitmap;
     private ImageView imageView;
@@ -50,6 +55,7 @@ public class OverviewActivity extends ActionBarActivity {
         setContentView(R.layout.activity_overview);
 
         mImageView = (ImageView)findViewById(R.id.img_thumbnail);
+        txtAddress = (EditText)findViewById(R.id.txt_address);
     }
 
     public void onButtonClick(View v) {
@@ -72,11 +78,45 @@ public class OverviewActivity extends ActionBarActivity {
                 }
 
                 stream = getContentResolver().openInputStream(data.getData());
-                //bitmap = BitmapFactory.decodeStream(stream);
+                ByteArrayOutputStream picSourceStream = new ByteArrayOutputStream();
 
-                //mImageView.setImageBitmap(bitmap);
+                InputStream picViewStream = null;
+                InputStream picUploadStream = null;
+                try {
+                    byte[] buffer = new byte[1024];
 
-                uploadFile(stream, "http://18.111.74.205:3700/analyze");
+                    int len;
+                    while ((len = stream.read(buffer)) > -1) {
+                        picSourceStream.write(buffer, 0, len);
+                    }
+                    picSourceStream.flush();
+
+                    picViewStream = new ByteArrayInputStream(picSourceStream.toByteArray());
+                    picUploadStream = new ByteArrayInputStream(picSourceStream.toByteArray());
+                } catch(IOException ex) {
+                    Log.e("Remote Notes", ex.toString());
+
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    ex.printStackTrace(pw);
+
+                    Log.e("Remote Notes", sw.toString());
+                }
+
+                // display the image
+                bitmap = BitmapFactory.decodeStream(stream);
+                mImageView.setImageBitmap(bitmap);
+
+                if(picUploadStream != null) {
+                    uploadFile(picSourceStream.toByteArray(), "http://" + txtAddress.getText() + "/analyze");
+                } else {
+                    Context context = getApplicationContext();
+                    CharSequence text = "can't upload - null stream";
+                    int duration = Toast.LENGTH_SHORT;
+
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                }
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } finally {
@@ -91,7 +131,7 @@ public class OverviewActivity extends ActionBarActivity {
         }
     }
 
-    void uploadFile(InputStream fileInputStream, String server) {
+    void uploadFile(byte[] file, String server) {
         HttpURLConnection connection = null;
         DataOutputStream outputStream = null;
         DataInputStream inputStream = null;
@@ -109,37 +149,19 @@ public class OverviewActivity extends ActionBarActivity {
             connection.setDoOutput(true);
             connection.setUseCaches(false);
 
-            bytesAvailable = fileInputStream.available();
-            bufferSize = Math.min(bytesAvailable, maxBufferSize);
-            buffer = new byte[bufferSize];
-            ByteArrayOutputStream fileByteStream = new ByteArrayOutputStream();
-
-            // Read file
-            bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-            while(bytesRead > 0) {
-                fileByteStream.write(buffer, 0, bufferSize);
-                bytesAvailable = fileInputStream.available();
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-            }
-
-            byte[] theFile = fileByteStream.toByteArray();
-
-            // Enable POST method
+            // enable POST method
             connection.setRequestMethod("POST");
 
             connection.setRequestProperty("User-Agent", "remote notes");
             connection.setRequestProperty("Accept", "*/*");
-            connection.setRequestProperty("Content-Length", "" + theFile.length);
+            connection.setRequestProperty("Content-Length", "" + file.length);
             connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             connection.setRequestProperty("Expect", "100-continue");
 
             outputStream = new DataOutputStream(connection.getOutputStream());
 
-            outputStream.write(theFile, 0, theFile.length);
+            outputStream.write(file, 0, file.length);
 
-            fileInputStream.close();
             outputStream.flush();
             outputStream.close();
         } catch (Exception ex) {
