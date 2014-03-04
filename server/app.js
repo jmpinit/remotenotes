@@ -55,10 +55,10 @@ app.post("/analyze", function(req, res) {
 	});
 });
 
-app.get("/image/:basename", function(req, res) {
+app.get("/note/:basename", function(req, res) {
 	var basename_pic = req.params.basename;
-	var fn_pic = "/data/image/" + basename_pic;
-	var url_pic = "image/" + basename_pic;
+	var fn_pic = "data/image/" + basename_pic + ".jpg";
+	var url_pic = "/image/" + basename_pic + ".jpg";
 
 	console.log("request for image " + url_pic);
 

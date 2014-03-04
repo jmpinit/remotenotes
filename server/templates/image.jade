@@ -1,0 +1,17 @@
+doctype html
+html
+	head
+		title= 'image ' + id_pic
+
+		meta(name="viewport" content="width=device-width, initial-scale=1.0")
+		link(href="/css/bootstrap.min.css" rel="stylesheet" media="screen")
+
+		script(src='//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js')
+	body
+		div(class='container')
+			div(class='hero-unit')
+				center
+					h1='Note '
+					i='(' + id_pic + ')'
+					br
+					img(src=url_pic)
