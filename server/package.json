@@ -6,6 +6,7 @@
         "socket.io": "latest",
         "express": "latest",
         "jade": "latest",
+        "node-uuid": "latest",
         "zerorpc": "latest"
     },
 	"scripts": {
