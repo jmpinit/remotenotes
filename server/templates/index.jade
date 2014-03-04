@@ -7,13 +7,20 @@ html
 		link(href="/css/bootstrap.min.css" rel="stylesheet" media="screen")
 
 	body(onload='start()')
-		div(class='container')
-			h1 Note Server
-			ul#notelist
-				each val in notes
-					li
-						a(href='/note/' + val)
-							p=val
+		div.container
+			div.page-header
+				h1 Remote Notes
+
+			div.well.well-small
+				ul#notelist
+					- if(notes.length > 0) {
+					each val in notes
+						li
+							a(href='/note/' + val)
+								p=val
+					- } else {
+					p empty
+					- }
 	
 	script(type='text/javascript').
 		var socket;
